@@ -1,3 +1,8 @@
+### Pyspark On Windows  
+* Abrir terminal como administrador.
+* Dentro da pasta do Spark Executar.
+```./bin/pyspark```
+
 ### PySpark Install  
 https://medium.com/big-data-engineering/how-to-install-apache-spark-2-x-in-your-pc-e2047246ffc3  
 https://medium.com/@naomi.fridman/install-pyspark-to-run-on-jupyter-notebook-on-windows-4ec2009de21f  
