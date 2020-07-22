@@ -19,7 +19,7 @@ Dessa maneira, vou apenas documentar cada passo do processo.
 ![image info](./imgs/sparkkey.png)  
   
 8. Download as chaves e manter em local seguro.   
-9 Instalar PuTTy  putty.exe puttygen.exe para converter pen file to ppk file que putty pode usar.   
+9. Instalar PuTTy  putty.exe puttygen.exe para converter pen file to ppk file que putty pode usar.  
 10. Abrir putty e clicar em load (alterar para all files)  e selecionar sparkkey.pem.  
 11. OK, save private key
 
@@ -36,8 +36,8 @@ Dessa maneira, vou apenas documentar cada passo do processo.
 ---------------  
 ### Running on Spark Cluster on AWS  
   
-spark-submit -executor-memory 1g MovieSimilarities1M.py 260   
-1giga de memoria por execucao. EMR set Yarn como Deafault.  
+* spark-submit -executor-memory 1g MovieSimilarities1M.py 260     
+* 1giga de memoria por execucao. EMR set Yarn como Deafault.  
   -----------
 
 1. Na AWS, Clicar em EMR.
@@ -46,9 +46,16 @@ spark-submit -executor-memory 1g MovieSimilarities1M.py 260
 4. Number of Instances 10, cuidado! lol  
 5. Key par: sparkkey criado anteriormente.  
 6. Clicar em Create Cluster.  
-
-
-
-
-
+-----------------------------
+7. Em master public DNS clicar em SSh  
+![image info](./imgs/ssh.png)  
+  
+8. copy host name field, abrir puuty e colocar no host name, ir em SSH > Auth, selecionar ppk file.
+9. Voce esta logado.
+10. Com o codigo para ser executado np S3 digitar no putty: aws s3 cp s3://sundog-spark/MovieSimilarities1M.py ./  
+11. aws s3 cp s3://sundog-spark/ml-1m/movies.dat ./  
+12. spark-submit --executor-memory 1g MovieSimilarities1M.py 260.
+13. o "260" e o id do filme que busco a similaridade.  
+-------------
+SHUT DOWN YOUR CLUSTER!  
   
