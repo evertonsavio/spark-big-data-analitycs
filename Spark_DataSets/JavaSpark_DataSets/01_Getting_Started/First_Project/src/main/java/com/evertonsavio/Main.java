@@ -21,7 +21,9 @@ public class Main {
                 .config("spark.sql.warehouse.dir","file:///c:/tmp/")
                 .getOrCreate();
 
-        Dataset<Row> dataset = spark.read().option("header", true).csv("src/main/resources/exams/students.csv");
+        Dataset<Row> dataset = spark.read()
+                .option("header", true)
+                .csv("src/main/resources/exams/students.csv");
 
         Dataset<Row> modernArtResults = dataset.filter(col("subject").equalTo("Modern Art")
                 .and(col("year").geq(2007)));

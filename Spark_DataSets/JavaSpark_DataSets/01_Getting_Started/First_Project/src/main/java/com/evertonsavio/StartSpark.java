@@ -1,10 +1,11 @@
 package com.evertonsavio;
 
+import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
-import static org.apache.spark.sql.functions.*;
+import static org.apache.spark.sql.functions.*; // function.col => col because is static * "Static Import"
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -31,13 +32,18 @@ public class StartSpark {
         //long numberOfRows = dataset.count();
         //System.out.println(numberOfRows);
         ////////////////////////////////////////////////////////////////////////FILTER
+        //Column subjectColumn = dataset.col("subject");
+        //Column yearnColumn = dataset.col("year");
+        //Dataset<Row> mdrnArt = dataset.filter(subjectColumn
+        //        .equalTo("Modern Art")
+        //        .and(yearnColumn.geq(2007)));
 
         Dataset<Row> mathResult = dataset.filter(col("subject")
                 .equalTo("Math")
                 .and(col("year").equalTo("2005")));
 
         Dataset<Row> modernArtResults = dataset.filter("subject = 'Modern Art' AND year == 2007");
-        
+
         //Lambda
         //Dataset<Row> modernArt = dataset
         // .filter(row -> row.getAs("subject")
