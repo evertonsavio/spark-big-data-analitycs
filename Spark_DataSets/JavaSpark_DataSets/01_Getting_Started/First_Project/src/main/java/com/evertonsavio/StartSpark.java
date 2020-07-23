@@ -30,17 +30,20 @@ public class StartSpark {
         //dataset.show();
         //long numberOfRows = dataset.count();
         //System.out.println(numberOfRows);
-        /////////////////////////////////////////////////////////////////////////
-        ///FILTER
+        ////////////////////////////////////////////////////////////////////////FILTER
 
         Dataset<Row> mathResult = dataset.filter(col("subject")
                 .equalTo("Math")
                 .and(col("year").equalTo("2005")));
 
         Dataset<Row> modernArtResults = dataset.filter("subject = 'Modern Art' AND year == 2007");
-
-        /////////////////////////////////////////////////////////////////////////
-        ///SHOW
+        
+        //Lambda
+        //Dataset<Row> modernArt = dataset
+        // .filter(row -> row.getAs("subject")
+        // .equals("Modern Art") && Integer
+        // .parseInt(row.getAs("year))>= 2007);
+        /////////////////////////////////////////////////////////////////////////SHOW
 
         modernArtResults.show();
         mathResult.show();
