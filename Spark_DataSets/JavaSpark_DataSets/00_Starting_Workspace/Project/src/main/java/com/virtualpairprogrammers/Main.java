@@ -20,13 +20,13 @@ public class Main {
 	@SuppressWarnings("resource")
 	public static void main(String[] args) 
 	{
-		System.setProperty("hadoop.home.dir", "c:/hadoop");
+		System.setProperty("hadoop.home.dir", "d:/hadoop");
 		Logger.getLogger("org.apache").setLevel(Level.WARN);
 		
 		SparkConf conf = new SparkConf().setAppName("startingSpark").setMaster("local[*]");
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		
-		JavaRDD<String> initialRdd = sc.textFile("src/main/resources/subtitles/input.txt");
+		JavaRDD<String> initialRdd = sc.textFile("src/main/resources/biglog.txt");
 		
 		JavaRDD<String> lettersOnlyRdd = initialRdd.map( sentence -> sentence.replaceAll("[^a-zA-Z\\s]", "").toLowerCase() );
 		
