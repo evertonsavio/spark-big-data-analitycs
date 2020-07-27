@@ -10,6 +10,7 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import org.bouncycastle.asn1.dvcs.Data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +32,14 @@ public class MultipleGroupSpark {
         Dataset<Row> results = spark.sql("select level, date_format(datetime, 'MMMM') as month from logging_table");
 
         results.createOrReplaceTempView("logging_table");
-        results = spark.sql("select level, month, count(1) as total from logging_table group by level, month");
+        Dataset<Row> resul = spark.sql("select level, month, count(1) as total from logging_table group by level, month");
 
-        results.show(100);
+        resul.show(100);
+
+        resul.createOrReplaceTempView("results_table");
+        Dataset<Row> totalResul = spark.sql("select sum(total) from results_table");
+
+        totalResul.show();
 
         spark.close();
 
