@@ -30,9 +30,21 @@ public class UDF_UserDefinedFunctionsSpark {
         //dataset = dataset.withColumn("pass", lit("Yes"));
         //dataset = dataset.withColumn("pass", lit(col("grade").equalTo("A+")));
         //USING UDF User Defined Function
-        spark.udf().register("hasPassed", (String grade) -> grade.equals("A+"), DataTypes.BooleanType);
 
-        dataset = dataset.withColumn("pass", callUDF("hasPassed", col("grade")));
+        //spark.udf().register("hasPassed", (String grade) -> grade.equals("A+"), DataTypes.BooleanType);
+
+        spark.udf().register("hasPassed", (String grade, String subject) -> {
+
+            if(subject.equals("Biology")){
+                if (grade.startsWith("A")) return true;
+                return false;
+            }
+            return grade.startsWith("A") || grade.startsWith("B")|| grade.startsWith("C");
+
+        }, DataTypes.BooleanType);
+
+        dataset = dataset.withColumn("pass",
+                callUDF("hasPassed", col("grade"), col("subject")));
 
         dataset.show();
         spark.close();
