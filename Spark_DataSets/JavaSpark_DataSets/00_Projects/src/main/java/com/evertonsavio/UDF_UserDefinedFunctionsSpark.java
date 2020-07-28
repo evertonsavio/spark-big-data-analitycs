@@ -7,6 +7,8 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 
+import java.util.Scanner;
+
 import static org.apache.spark.sql.functions.*;
 
 
@@ -47,6 +49,10 @@ public class UDF_UserDefinedFunctionsSpark {
                 callUDF("hasPassed", col("grade"), col("subject")));
 
         dataset.show();
+
+        Scanner scanner = new Scanner(System.in);
+        scanner.nextLine();
+
         spark.close();
 
     }
