@@ -41,9 +41,13 @@ public class HousePriceAnalysisSolution {
 
 		//csvData.printSchema();
 		//csvData.show();
-		
+
+		///////////////////////Criando vetor de Features///////////////////////////////////////////////////////////
+
+		csvData = csvData.withColumn("sqft_above_percentage", col("sqft_above").divide(col("sqft_living")));
+
 		VectorAssembler vector = new VectorAssembler();
-		vector.setInputCols(new String[]{"bedrooms", "bathrooms", "sqft_living"});
+		vector.setInputCols(new String[]{"bedrooms", "bathrooms", "sqft_living", "sqft_above_percentage", "floors"});
 		vector.setOutputCol("features");
 		Dataset<Row> csvDataWithFeatures = vector.transform(csvData);
 		csvDataWithFeatures.show();
@@ -53,17 +57,46 @@ public class HousePriceAnalysisSolution {
 
 		//modelInput.show();
 
-		Dataset<Row>[] trainAndTestData = modelInput.randomSplit(new double[]{0.8, 0.2});
-		Dataset<Row> trainingData = trainAndTestData[0];
-		Dataset<Row> testingData = trainAndTestData[1];
+		//////////////////////Spliting data em test treino e Hold Out Data devido ao GRID///////////////////////////
 
-		LinearRegressionModel model = new LinearRegression().fit(trainingData);
+		Dataset<Row>[] dataSplits = modelInput.randomSplit(new double[]{0.8, 0.2});
+		Dataset<Row> trainingAndTestData = dataSplits[0];
+		Dataset<Row> holdOutData = dataSplits[1];
 
-		model.transform(testingData).show();
+		//////////////////////Construir e Lidar com os parametros do modelo atraves de GRID////////////////////////
 
-		System.out.println("The training data r2 value is" + model.summary().r2() + "RMSE is: " + model.summary().rootMeanSquaredError());
+		LinearRegression linearRegression = new LinearRegression();
+		ParamGridBuilder paramGridBuilder = new ParamGridBuilder();
 
-		System.out.println("The testing data r2 value is" + model.evaluate(testingData).r2() + "RMSE is: " + model.evaluate(testingData).rootMeanSquaredError());
+		ParamMap[] paramMaps = paramGridBuilder
+				.addGrid(linearRegression.regParam(), new double[]{0.01, 0.1, 0.5})
+				.addGrid(linearRegression.elasticNetParam(), new double[] {0, 0.5,1})
+				.build();
 
+		TrainValidationSplit trainValidationSplit = new TrainValidationSplit()
+				.setEstimator(linearRegression)
+				.setEvaluator(new RegressionEvaluator().setMetricName("r2"))
+				.setEstimatorParamMaps(paramMaps)
+				.setTrainRatio(0.8);
+
+		TrainValidationSplitModel model = trainValidationSplit.fit(trainingAndTestData);
+		LinearRegressionModel lrmodel = (LinearRegressionModel) model.bestModel();
+
+		//LinearRegressionModel model = new LinearRegression()
+		//		.setMaxIter(10) // Olhar documentacao;
+		//		.setRegParam(0.3)
+		//		.setElasticNetParam(0.8)
+		//		.fit(trainingData);
+		//model.transform(testingData).show();
+		//System.out.println("The training data r2 value is" + model.summary().r2() + "RMSE is: " + model.summary().rootMeanSquaredError());
+		//System.out.println("The testing data r2 value is" + model.evaluate(testingData).r2() + "RMSE is: " + model.evaluate(testingData).rootMeanSquaredError());
+
+		System.out.println("The training data r2 value is" + lrmodel.summary().r2() + "RMSE is: " + lrmodel.summary().rootMeanSquaredError());
+
+		System.out.println("The testing data r2 value is" + lrmodel.evaluate(holdOutData).r2() + "RMSE is: " + lrmodel.evaluate(holdOutData).rootMeanSquaredError());
+
+		System.out.println("Coeficients: "+ lrmodel.coefficients() + "Intecept: "+ lrmodel.intercept());
+
+		System.out.println(lrmodel.getRegParam() + " " +lrmodel.getElasticNetParam());
 	}
 }

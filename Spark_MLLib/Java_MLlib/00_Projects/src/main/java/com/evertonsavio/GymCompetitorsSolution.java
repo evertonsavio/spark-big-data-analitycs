@@ -31,10 +31,21 @@ public class GymCompetitorsSolution {
 
 		csvData.printSchema();
 
+		/////////////////////////////////ENCODING/////////////////////////////
+		StringIndexer genderIndexer = new StringIndexer();
+		genderIndexer.setInputCol("Gender");
+		genderIndexer.setOutputCol("GenderIndex");
+		csvData = genderIndexer.fit(csvData).transform(csvData);
+
+		OneHotEncoderEstimator oneHotEncoderEstimator = new OneHotEncoderEstimator();
+		oneHotEncoderEstimator.setInputCols(new String[]{"GenderIndex"});
+		oneHotEncoderEstimator.setOutputCols(new String[]{"GenderVector"});
+		csvData = oneHotEncoderEstimator.fit(csvData).transform(csvData);
+
 		csvData.show();
 
 		VectorAssembler vector = new VectorAssembler();
-		vector.setInputCols(new String[]{"Age", "Height", "Weight"});
+		vector.setInputCols(new String[]{"Age", "Height", "Weight", "GenderVector"});
 		vector.setOutputCol("features");
 		Dataset<Row> csvDataWithFeatures = vector.transform(csvData);
 
