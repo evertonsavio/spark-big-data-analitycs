@@ -50,8 +50,8 @@ public class UDF_UserDefinedFunctionsSpark {
 
         dataset.show();
 
-        Scanner scanner = new Scanner(System.in);
-        scanner.nextLine();
+        //Scanner scanner = new Scanner(System.in);
+        //scanner.nextLine();
 
         spark.close();
 
