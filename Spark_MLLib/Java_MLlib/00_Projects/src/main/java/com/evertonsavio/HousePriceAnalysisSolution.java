@@ -42,12 +42,36 @@ public class HousePriceAnalysisSolution {
 		//csvData.printSchema();
 		//csvData.show();
 
-		///////////////////////Criando vetor de Features///////////////////////////////////////////////////////////
+		///////////////////////Criando vetor de Features/////////////////////////////////////////////////////////////////////////////
 
 		csvData = csvData.withColumn("sqft_above_percentage", col("sqft_above").divide(col("sqft_living")));
 
+		/////////////////////////////////ENCODING////////////////////////////////////////////////////////////////////////////////////
+		StringIndexer conditionIndexer = new StringIndexer();
+		conditionIndexer.setInputCol("condition");
+		conditionIndexer.setOutputCol("conditionIndex");
+		csvData = conditionIndexer.fit(csvData).transform(csvData);
+
+		StringIndexer gradeIndexer = new StringIndexer();
+		gradeIndexer.setInputCol("grade");
+		gradeIndexer.setOutputCol("gradeIndex");
+		csvData = gradeIndexer.fit(csvData).transform(csvData);
+
+		StringIndexer zipcodeIndexer = new StringIndexer();
+		zipcodeIndexer.setInputCol("zipcode");
+		zipcodeIndexer.setOutputCol("zipcodeIndex");
+		csvData = zipcodeIndexer.fit(csvData).transform(csvData);
+
+		OneHotEncoderEstimator oneHotEncoderEstimator = new OneHotEncoderEstimator();
+		oneHotEncoderEstimator.setInputCols(new String[]{"conditionIndex", "gradeIndex", "zipcodeIndex"});
+		oneHotEncoderEstimator.setOutputCols(new String[]{"conditionVector", "gradeVector", "zipcodeVector"});
+		csvData = oneHotEncoderEstimator.fit(csvData).transform(csvData);
+
+		csvData.show();
+
 		VectorAssembler vector = new VectorAssembler();
-		vector.setInputCols(new String[]{"bedrooms", "bathrooms", "sqft_living", "sqft_above_percentage", "floors"});
+		vector.setInputCols(new String[]{"bedrooms", "bathrooms", "sqft_living", "sqft_above_percentage", "floors",
+				"conditionVector", "gradeVector", "zipcodeVector"});
 		vector.setOutputCol("features");
 		Dataset<Row> csvDataWithFeatures = vector.transform(csvData);
 		csvDataWithFeatures.show();
