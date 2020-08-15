@@ -5,6 +5,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel;
 import org.apache.spark.ml.classification.DecisionTreeClassifier;
+import org.apache.spark.ml.classification.RandomForestClassificationModel;
+import org.apache.spark.ml.classification.RandomForestClassifier;
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator;
 import org.apache.spark.ml.feature.IndexToString;
 import org.apache.spark.ml.feature.StringIndexer;
 import org.apache.spark.ml.feature.VectorAssembler;
@@ -86,13 +89,31 @@ public class VPPFreeTrialsSolution {
 
 		DecisionTreeClassifier dtc = new DecisionTreeClassifier();
 
-		dtc.setMaxDepth(3);
+		dtc.setMaxDepth(5);
 
 		DecisionTreeClassificationModel model = dtc.fit(trainingData);
 
-		model.transform(houdoutData).show();
+		Dataset<Row> predictions = model.transform(houdoutData);
+		predictions.show();
 
 		System.out.println(model.toDebugString());
+
+		MulticlassClassificationEvaluator evaluator = new MulticlassClassificationEvaluator();
+		evaluator.setMetricName("accuracy");
+		System.out.println("Accuracy: " + evaluator.evaluate(predictions));
+
+		////////////////////////RANDOM FOREST/////////////////////
+		RandomForestClassifier randomForestClassifier = new RandomForestClassifier();
+		randomForestClassifier.setMaxDepth(5);
+		RandomForestClassificationModel rfmodel = randomForestClassifier.fit(trainingData);
+		Dataset<Row> predictions2 = rfmodel.transform(houdoutData);
+
+		predictions2.show();
+		System.out.println(rfmodel.toDebugString());
+		System.out.println("Accuracy Random Forest: " + evaluator.evaluate(predictions2));
+
+
+
 
 	}
 
