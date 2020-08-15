@@ -8,10 +8,12 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
+import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka010.ConsumerStrategies;
 import org.apache.spark.streaming.kafka010.KafkaUtils;
 import org.apache.spark.streaming.kafka010.LocationStrategies;
+import scala.Tuple2;
 
 import java.util.*;
 
@@ -39,7 +41,12 @@ public class ViewingFiguresDStreamVersion {
 
         JavaDStream<String> result = stream.map(item -> item.value());
 
-        result.print();
+        JavaPairDStream<Long, String> results = stream.mapToPair(item -> new Tuple2<String, Long>(item.value(), 5L))
+                .reduceByKeyAndWindow((x,y) -> x+y, Durations.minutes(60),Durations.seconds(30))
+                .mapToPair(item -> item.swap())
+                .transformToPair(rdd -> rdd.sortByKey(false));
+
+        results.print(50);
 
         sc.start();
         sc.awaitTermination();
