@@ -68,9 +68,7 @@ public static void main(String[] args) {
 			}
 
 			predictions.groupBy("prediction").count().show();
-
 			System.out.println("sse is " + model.computeCost(inputData));
-
 			ClusteringEvaluator evaluator = new ClusteringEvaluator();
 			System.out.println("Slihouette with squared euclidian distance is " + evaluator.evaluate(predictions));
 
